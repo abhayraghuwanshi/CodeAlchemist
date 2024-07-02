@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @Tag("Unit")
@@ -24,7 +26,7 @@ public class RunAndCompilerServiceTests {
     private RunAndCompilerService runAndCompilerService;
 
 
-     private final String code = "class Solution {\n" +
+     private final String code = "public class Solution {\n" +
             "    public int[] buildArray(final int[] nums) {\n" +
             "        final int n = nums.length;\n" +
             "        final int[] ans = new int[n];\n" +
@@ -38,14 +40,14 @@ public class RunAndCompilerServiceTests {
 
      @AfterEach
     void afterEach() throws IOException {
-         Path path = Paths.get("workspace/inputCode.java");
+         Path path = Paths.get("workspace/Solution.java");
          Files.delete(path);
     }
 
     @Test
     @DisplayName("Should Create the Java File")
      void test1() throws IOException {
-        Path path = Paths.get("workspace/inputCode.java");
+        Path path = Paths.get("workspace/Solution.java");
         runAndCompilerService.createJavaFile(code);
         assert(Files.exists(path));
     }
@@ -53,9 +55,41 @@ public class RunAndCompilerServiceTests {
     @Test
     @DisplayName("Create and Compile Java file")
     void test2() throws IOException {
-        Path path = Paths.get("workspace/inputCode.java");
-        runAndCompilerService.createAndCompilerJavaFile(code);
+        Path path = Paths.get("workspace/Solution.java");
+        boolean ret = runAndCompilerService.createAndCompilerJavaFile(code);
         assert(Files.exists(path));
+        assertTrue(ret);
+
+    }
+
+    @Test
+    @DisplayName("tesst")
+    void test3(){
+        try {
+            // Compile the Java file
+            String className = "Solution";
+            boolean isSuccess = runAndCompilerService.createAndCompilerJavaFile(code);
+            if (isSuccess) {
+                System.out.println("Compilation successful!");
+
+                // Parameters for the method
+                int[] nums = {0, 2, 1, 5, 3, 4};
+                Class<?>[] paramTypes = {int[].class};
+                Object[] params = {nums};
+
+                // Invoke the method dynamically
+                int[] result = (int[]) runAndCompilerService.invokeMethod(className, "buildArray", paramTypes, params);
+
+                // Print the result
+                for (int num : result) {
+                    System.out.print(num + " ");
+                }
+            } else {
+                System.out.println("Compilation failed!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -5,8 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,14 +21,14 @@ import java.nio.file.Paths;
 public class RunAndCompilerService {
 
 
-    public void createAndCompilerJavaFile(String javaCode) throws IOException {
+    public boolean createAndCompilerJavaFile(String javaCode) throws IOException {
         Path path = createJavaFile(javaCode);
-        compileJavaFile(path);
+        return compileJavaFile(path);
 
     }
 
     public Path createJavaFile(String javaCode) throws IOException {
-        Path path = Paths.get("workspace/inputCode.java");
+        Path path = Paths.get("workspace/Solution.java");
         Files.createFile(path);
         if (Files.exists(path)){
             Files.writeString(path, javaCode);
@@ -50,5 +55,18 @@ public class RunAndCompilerService {
 
     }
 
+//    public static boolean compileJavaFile(Path path) {
+//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//        return compiler.run(null, null, null, path.toString()) == 0;
+//    }
+
+
+    public static Object invokeMethod(String className, String methodName, Class<?>[] paramTypes, Object[] params) throws Exception {
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new URL("file:./workspace/") });
+        Class<?> cls = Class.forName(className, true, classLoader);
+        Method method = cls.getDeclaredMethod(methodName, paramTypes);
+        Object instance = cls.getDeclaredConstructor().newInstance();
+        return method.invoke(instance, params);
+    }
 
 }
