@@ -63,7 +63,7 @@ public class RunAndCompilerServiceTests {
     }
 
     @Test
-    @DisplayName("tesst")
+    @DisplayName("Create compile and run test cases")
     void test3(){
         try {
             // Compile the Java file
